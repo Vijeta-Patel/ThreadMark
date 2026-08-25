@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS garments (
+    id SERIAL PRIMARY KEY,
+    brand_name VARCHAR(255) NOT NULL,
+    material VARCHAR(255) NOT NULL,
+    size VARCHAR(50) NOT NULL,
+    color VARCHAR(100) NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
