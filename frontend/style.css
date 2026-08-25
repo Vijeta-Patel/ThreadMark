@@ -80,7 +80,7 @@ body {
 /* Layout */
 .container {
     width: 100%;
-    max-width: 600px;
+    max-width: 1000px; /* Increased to fit both cards side-by-side */
     padding: 2rem;
     z-index: 1;
 }
@@ -104,7 +104,20 @@ body {
     font-size: 1.1rem;
 }
 
-/* Form Styles */
+.main-content {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.form-wrapper {
+    flex: 1;
+    width: 100%;
+    max-width: 600px;
+}
+
+/* Glass Card Shared Styles */
 .glass-form {
     background: var(--card-bg);
     backdrop-filter: blur(16px);
@@ -236,7 +249,72 @@ select option {
     transform: translateX(4px);
 }
 
+/* QR Code Section Specifics */
+.qr-wrapper {
+    flex: 1;
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.qr-container {
+    background: white;
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    display: inline-block;
+}
+
+.qr-container canvas {
+    display: block;
+    max-width: 100%;
+    height: auto !important;
+}
+
+.qr-details {
+    text-align: left;
+    width: 100%;
+    background: rgba(0,0,0,0.2);
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+}
+
+.qr-details p {
+    margin-bottom: 0.5rem;
+}
+.qr-details p:last-child {
+    margin-bottom: 0;
+}
+.qr-details strong {
+    color: #a5b4fc;
+    display: inline-block;
+    width: 70px;
+}
+
+.secondary-btn {
+    background: transparent;
+    border: 2px solid var(--primary);
+    color: var(--text-main);
+}
+.secondary-btn:hover {
+    background: rgba(99, 102, 241, 0.2);
+    border-color: var(--primary-hover);
+}
+
 /* Responsiveness */
+@media (max-width: 900px) {
+    .main-content {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
 @media (max-width: 640px) {
     .form-row {
         flex-direction: column;
