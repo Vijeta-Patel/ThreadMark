@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
             material: document.getElementById('material').value,
             size: document.getElementById('size').value,
             color: document.getElementById('color').value,
+            origin: document.getElementById('origin').value,
             price: document.getElementById('price').value
         };
 
@@ -62,6 +63,7 @@ Brand: ${formData.brand_name}
 Material: ${formData.material}
 Size: ${formData.size}
 Color: ${formData.color}
+Origin: ${formData.origin}
 Price: $${formData.price}
 Status: Verified Authentic`;
 
@@ -83,6 +85,7 @@ Status: Verified Authentic`;
                     <p><strong>Material:</strong> ${formData.material}</p>
                     <p><strong>Size:</strong> ${formData.size}</p>
                     <p><strong>Color:</strong> ${formData.color}</p>
+                    <p><strong>Origin:</strong> ${formData.origin}</p>
                     <p><strong>Price:</strong> $${formData.price}</p>
                 `;
 

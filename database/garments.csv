@@ -1,4 +1,5 @@
-Brand Name,Material,Size,Color,Price,Timestamp
-"kiko milano","cotton","XS","neon","1","2026-08-25T18:05:44.787Z"
-"kiko milano","cotton","XS","neon","1","2026-08-25T18:21:54.123Z"
-"kiko milano","cotton","XS","neon","1","2026-08-25T18:22:11.415Z"
+Brand Name,Material,Size,Color,Origin,Price,Timestamp
+"kiko milano","cotton","XS","neon","Unknown","1","2026-08-25T18:05:44.787Z"
+"kiko milano","cotton","XS","neon","Unknown","1","2026-08-25T18:21:54.123Z"
+"kiko milano","cotton","XS","neon","Unknown","1","2026-08-25T18:22:11.415Z"
+"kiko milano","cotton","XS","neon","india","1","2026-08-25T18:39:04.678Z"

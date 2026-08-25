@@ -7,7 +7,7 @@ const CSV_FILE = path.join(__dirname, '../database/garments.csv');
 
 // Create CSV with headers if it doesn't exist
 if (!fs.existsSync(CSV_FILE)) {
-    fs.writeFileSync(CSV_FILE, 'Brand Name,Material,Size,Color,Price,Timestamp\n');
+    fs.writeFileSync(CSV_FILE, 'Brand Name,Material,Size,Color,Origin,Price,Timestamp\n');
 }
 
 // Basic CSV escaping function
@@ -24,7 +24,7 @@ const server = http.createServer((req, res) => {
                 const timestamp = new Date().toISOString();
                 
                 // Format as a CSV row
-                const csvRow = `${escapeCSV(data.brand_name)},${escapeCSV(data.material)},${escapeCSV(data.size)},${escapeCSV(data.color)},${escapeCSV(data.price)},${escapeCSV(timestamp)}\n`;
+                const csvRow = `${escapeCSV(data.brand_name)},${escapeCSV(data.material)},${escapeCSV(data.size)},${escapeCSV(data.color)},${escapeCSV(data.origin)},${escapeCSV(data.price)},${escapeCSV(timestamp)}\n`;
                 
                 // Append to CSV file
                 fs.appendFileSync(CSV_FILE, csvRow);
