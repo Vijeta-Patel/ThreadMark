@@ -16,6 +16,7 @@ export interface AuthedUser {
   id: string | null;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function requireUser(_request: Request): Promise<AuthedUser> {
   return { id: null };
 }
