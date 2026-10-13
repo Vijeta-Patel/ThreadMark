@@ -1,16 +1,12 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Fira_Code, Instrument_Serif, Roboto } from "next/font/google";
+import { SiteFooter } from "@/components/site-footer";
+import { SiteHeader } from "@/components/site-header";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const sans = Roboto({ variable: "--font-sans-body", subsets: ["latin"], weight: ["400", "500", "900"] });
+const serif = Instrument_Serif({ variable: "--font-serif-accent", subsets: ["latin"], weight: "400", style: ["normal", "italic"] });
+const mono = Fira_Code({ variable: "--font-mono-label", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "ThreadMark",
@@ -19,11 +15,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="en" className={`${sans.variable} ${serif.variable} ${mono.variable} h-full antialiased`}>
+      <body className="flex min-h-full flex-col">
+        <SiteHeader />
+        <div className="flex flex-1 flex-col">{children}</div>
+        <SiteFooter />
+      </body>
     </html>
   );
 }

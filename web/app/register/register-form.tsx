@@ -92,22 +92,24 @@ export function RegisterForm() {
   if (done) {
     const link = txLink(process.env.NEXT_PUBLIC_EXPLORER_TX_URL, done.txHash);
     return (
-      <section className="flex flex-col gap-4" aria-live="polite">
-        <h2 className="text-xl font-semibold text-green-700">Garment registered</h2>
-        <dl className="grid gap-3 text-sm">
-          <div>
-            <dt className="font-medium">Product ID</dt>
-            <dd className="break-all font-mono">{done.pid}</dd>
+      <section className="flex flex-col gap-6" aria-live="polite">
+        <h2 className="display text-4xl md:text-5xl">
+          Garment <em>registered</em>
+        </h2>
+        <dl className="grid gap-4">
+          <div className="border-t hairline pt-3">
+            <dt className="tag">Product ID</dt>
+            <dd className="mt-1 break-all font-mono text-lg">{done.pid}</dd>
           </div>
-          <div>
-            <dt className="font-medium">Hash</dt>
-            <dd className="break-all font-mono">{done.hash}</dd>
+          <div className="border-t hairline pt-3">
+            <dt className="tag">Hash</dt>
+            <dd className="mt-1 break-all font-mono text-sm">{done.hash}</dd>
           </div>
-          <div>
-            <dt className="font-medium">Transaction</dt>
-            <dd className="break-all font-mono">
+          <div className="border-t hairline pt-3">
+            <dt className="tag">Transaction</dt>
+            <dd className="mt-1 break-all font-mono text-sm">
               {link ? (
-                <a className="underline" href={link} target="_blank" rel="noreferrer">
+                <a className="underline underline-offset-4" href={link} target="_blank" rel="noreferrer">
                   {done.txHash}
                 </a>
               ) : (
@@ -116,18 +118,16 @@ export function RegisterForm() {
             </dd>
           </div>
         </dl>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={done.qrDataUrl} alt={`QR code for ${done.pid}`} width={240} height={240} className="border p-2" />
-        <p className="break-all text-xs text-gray-600">{done.verifyUrl}</p>
+        <div className="w-fit border hairline p-3">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={done.qrDataUrl} alt={`QR code for ${done.pid}`} width={240} height={240} />
+        </div>
+        <p className="break-all text-sm">{done.verifyUrl}</p>
         <div className="flex flex-wrap gap-3">
-          <a
-            href={done.qrDataUrl}
-            download={`ThreadMark-${done.pid}.png`}
-            className="rounded border border-gray-500 bg-black px-4 py-2 text-white"
-          >
+          <a href={done.qrDataUrl} download={`ThreadMark-${done.pid}.png`} className="pill pill-solid">
             Download QR
           </a>
-          <button type="button" onClick={reset} className="rounded border px-4 py-2">
+          <button type="button" onClick={reset} className="pill">
             Register another garment
           </button>
         </div>
@@ -136,20 +136,23 @@ export function RegisterForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
+    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-7">
       {formError && (
-        <p role="alert" className="rounded border border-red-600 bg-red-50 p-3 text-red-800">
+        <p role="alert" className="border border-brand bg-mist p-3">
+          <span aria-hidden="true" className="tag mr-2">
+            !
+          </span>
           {formError}
         </p>
       )}
       {fieldErrors.body && (
-        <p role="alert" className="text-sm text-red-700">
+        <p role="alert" className="font-serif text-lg italic">
           {fieldErrors.body}
         </p>
       )}
       {FIELDS.map(({ name, label, placeholder }) => (
         <div key={name} className="flex flex-col gap-1">
-          <label htmlFor={name} className="font-medium">
+          <label htmlFor={name} className="tag">
             {label}
           </label>
           <input
@@ -160,17 +163,17 @@ export function RegisterForm() {
             onChange={(e) => setValues((v) => ({ ...v, [name]: e.target.value }))}
             aria-invalid={fieldErrors[name] ? true : undefined}
             aria-describedby={fieldErrors[name] ? `${name}-error` : undefined}
-            className="rounded border border-gray-400 bg-transparent p-2"
+            className="field"
           />
           {fieldErrors[name] && (
-            <p id={`${name}-error`} className="text-sm text-red-700">
-              {fieldErrors[name]}
+            <p id={`${name}-error`} className="font-serif text-lg italic">
+              ↳ {fieldErrors[name]}
             </p>
           )}
         </div>
       ))}
-      <div className="flex flex-col gap-1">
-        <label htmlFor="image" className="font-medium">
+      <div className="flex flex-col gap-2">
+        <label htmlFor="image" className="tag">
           Product image (optional)
         </label>
         <input
@@ -180,18 +183,17 @@ export function RegisterForm() {
           accept="image/jpeg,image/png,image/webp"
           onChange={(e) => setFile(e.target.files?.[0] ?? null)}
           aria-invalid={fieldErrors.image ? true : undefined}
+          className="text-sm file:mr-3 file:cursor-pointer file:rounded-full file:border file:border-brand file:bg-transparent file:px-4 file:py-1 file:font-serif file:italic file:text-brand"
         />
         {(fieldErrors.image || fieldErrors.imageRef) && (
-          <p className="text-sm text-red-700">{fieldErrors.image ?? fieldErrors.imageRef}</p>
+          <p className="font-serif text-lg italic">↳ {fieldErrors.image ?? fieldErrors.imageRef}</p>
         )}
       </div>
-      <button
-        type="submit"
-        disabled={submitting}
-        className="rounded border border-gray-500 bg-black px-4 py-2 text-white disabled:opacity-60"
-      >
-        {submitting ? "Registering…" : "Register garment"}
-      </button>
+      <div>
+        <button type="submit" disabled={submitting} className="pill pill-solid">
+          {submitting ? "Registering…" : "Register garment"}
+        </button>
+      </div>
     </form>
   );
 }

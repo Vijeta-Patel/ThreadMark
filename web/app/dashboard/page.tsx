@@ -11,17 +11,20 @@ import type { GarmentRow, GarmentStatus } from "@/lib/types";
 export const metadata: Metadata = { title: "Registered garments · ThreadMark" };
 
 const STATUS_STYLE: Record<GarmentStatus, string> = {
-  confirmed: "border-green-600 text-green-700",
-  pending: "border-gray-500 text-gray-600",
-  failed: "border-red-600 text-red-700",
+  confirmed: "status",
+  pending: "status status-pending",
+  failed: "status status-failed",
 };
 
 export default function DashboardPage() {
   return (
-    <main className="mx-auto w-full max-w-4xl flex-1 p-4 sm:p-6">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold">Registered garments</h1>
-        <Link href="/register" className="rounded border border-gray-500 px-3 py-1.5">
+    <main className="px-5 pt-12 md:pt-20">
+      <p className="tag mb-4">Manufacturer</p>
+      <div className="mb-10 flex flex-wrap items-end justify-between gap-6">
+        <h1 className="display text-5xl md:text-7xl">
+          Registered <em>garments</em>
+        </h1>
+        <Link href="/register" className="pill pill-solid">
           Register a garment
         </Link>
       </div>
@@ -48,7 +51,7 @@ async function GarmentList() {
       return (
         <p role="alert">
           Please log in to continue.{" "}
-          <Link href="/login" className="underline">
+          <Link href="/login" className="underline underline-offset-4">
             Log in
           </Link>
         </p>
@@ -77,38 +80,38 @@ async function GarmentList() {
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[34rem] border-collapse text-left text-sm">
+      <table className="w-full min-w-[40rem] border-collapse text-left">
         <thead>
-          <tr className="border-b border-gray-500">
-            <th className="p-2">Product ID</th>
-            <th className="p-2">SKU</th>
-            <th className="p-2">Brand</th>
-            <th className="p-2">Status</th>
-            <th className="p-2">Registered on</th>
-            <th className="p-2">QR code</th>
+          <tr className="tag border-b border-brand">
+            <th className="py-2 pr-4 font-normal">Product ID</th>
+            <th className="py-2 pr-4 font-normal">SKU</th>
+            <th className="py-2 pr-4 font-normal">Brand</th>
+            <th className="py-2 pr-4 font-normal">Status</th>
+            <th className="py-2 pr-4 font-normal">Registered on</th>
+            <th className="py-2 font-normal">QR code</th>
           </tr>
         </thead>
         <tbody>
           {items.map(({ row, qr }) => (
-            <tr key={row.pid} className="border-b border-gray-700">
-              <td className="p-2 font-mono">
+            <tr key={row.pid} className="border-b hairline">
+              <td className="py-3 pr-4 font-mono">
                 {row.status === "confirmed" ? (
-                  <Link href={`/verify/${row.pid}`} className="underline">
+                  <Link href={`/verify/${row.pid}`} className="underline underline-offset-4">
                     {row.pid}
                   </Link>
                 ) : (
                   row.pid
                 )}
               </td>
-              <td className="p-2">{row.sku}</td>
-              <td className="p-2">{row.brand}</td>
-              <td className="p-2">
-                <span className={`rounded border px-2 py-0.5 ${STATUS_STYLE[row.status]}`}>{row.status}</span>
+              <td className="py-3 pr-4">{row.sku}</td>
+              <td className="py-3 pr-4">{row.brand}</td>
+              <td className="py-3 pr-4">
+                <span className={STATUS_STYLE[row.status]}>{row.status}</span>
               </td>
-              <td className="p-2">{formatUtc(row.registered_at)}</td>
-              <td className="p-2">
+              <td className="py-3 pr-4">{formatUtc(row.registered_at)}</td>
+              <td className="py-3 pr-4">
                 {qr ? (
-                  <a href={qr} download={`ThreadMark-${row.pid}.png`} className="underline">
+                  <a href={qr} download={`ThreadMark-${row.pid}.png`} className="underline underline-offset-4">
                     Download QR
                   </a>
                 ) : (
