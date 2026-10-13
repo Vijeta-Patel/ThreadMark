@@ -1,11 +1,12 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { IMAGE_BUCKET } from "./storage";
 
 // Server-side Supabase client using the service-role key.
 // Import this only from server code (route handlers, server components).
 // The key lives in SUPABASE_SERVICE_ROLE_KEY, which has no NEXT_PUBLIC_ prefix,
 // so Next.js never sends it to the browser.
 
-export const IMAGE_BUCKET = "garment-images";
+export { IMAGE_BUCKET };
 
 let client: SupabaseClient | null = null;
 

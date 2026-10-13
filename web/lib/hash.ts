@@ -1,5 +1,8 @@
 import { createHash } from "node:crypto";
+import { isValidDateString } from "./date";
 import type { NormalizedGarment } from "./types";
+
+export { isValidDateString };
 
 // Single implementation of the hash rule in the project requirements, section 9.3.
 // Registration and verification must both call these functions; nobody re-implements them.
@@ -15,18 +18,6 @@ type HashableGarment = {
 /** Trim and collapse runs of whitespace to a single space. */
 function clean(value: string): string {
   return value.trim().replace(/\s+/g, " ");
-}
-
-/** True for a real calendar date written exactly as YYYY-MM-DD. */
-export function isValidDateString(value: string): boolean {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
-  const [year, month, day] = value.split("-").map(Number);
-  const date = new Date(Date.UTC(year, month - 1, day));
-  return (
-    date.getUTCFullYear() === year &&
-    date.getUTCMonth() === month - 1 &&
-    date.getUTCDate() === day
-  );
 }
 
 function requireText(name: string, value: unknown): string {

@@ -1,5 +1,5 @@
 import type { GarmentInput } from "./types";
-import { isValidDateString } from "./hash";
+import { isValidDateString } from "./date";
 
 // Input validation for garment registration. Wording is fixed by the project
 // requirements, section 9.9; limits come from section 9.8.
