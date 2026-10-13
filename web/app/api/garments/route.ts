@@ -1,7 +1,7 @@
 import { requireUser, UnauthorizedError } from "@/lib/auth";
 import { registerOnChain } from "@/lib/chain"; // owned by Aditi (chain client)
 import { makeQrDataUrl } from "@/lib/qr"; // owned by Aditi (QR helper)
-import { findGarmentBySku, insertGarment, updateGarment } from "@/lib/garments-store";
+import { deleteGarment, findGarmentBySku, insertGarment, updateGarment } from "@/lib/garments-store";
 import { generatePid } from "@/lib/pid";
 import { registerGarment } from "@/lib/register-garment";
 
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
   try {
     const result = await registerGarment(
       {
-        store: { findGarmentBySku, insertGarment, updateGarment },
+        store: { findGarmentBySku, insertGarment, updateGarment, deleteGarment },
         chain: { registerOnChain },
         makeQrDataUrl,
         generatePid,

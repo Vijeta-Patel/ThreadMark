@@ -13,6 +13,7 @@ function makeDeps() {
       findGarmentBySku: vi.fn(async () => null as GarmentRow | null),
       insertGarment: vi.fn(async (row) => ({ ...row, tx_hash: null, status: "pending", registered_at: "x" }) as GarmentRow),
       updateGarment: vi.fn(async () => {}),
+      deleteGarment: vi.fn(async () => {}),
     },
     chain: { registerOnChain: vi.fn(async () => ({ txHash: "0xabc" })) },
     makeQrDataUrl: vi.fn(async (url: string) => `data:image/png;base64,QR(${url})`),
@@ -82,7 +83,7 @@ describe("registerGarment", () => {
 
   it("answers 409 duplicate_sku when the SKU exists, regardless of letter case", async () => {
     const deps = makeDeps();
-    deps.store.findGarmentBySku.mockResolvedValueOnce({ pid: "TM-OLD" } as GarmentRow);
+    deps.store.findGarmentBySku.mockResolvedValueOnce({ pid: "TM-OLD", status: "confirmed" } as GarmentRow);
     const result = await registerGarment(deps, null, good);
     expect(result).toEqual({ status: 409, body: { error: "duplicate_sku" } });
     expect(deps.store.findGarmentBySku).toHaveBeenCalledWith("WN260101");
@@ -114,6 +115,43 @@ describe("registerGarment", () => {
     await expect(registerGarment(deps, null, good)).rejects.toThrow(/unique product id/);
     expect(deps.store.insertGarment).toHaveBeenCalledTimes(5);
     expect(deps.chain.registerOnChain).not.toHaveBeenCalled();
+  });
+
+  it("chain failure: 502, row marked failed, no confirmation, no QR", async () => {
+    const deps = makeDeps();
+    deps.chain.registerOnChain.mockRejectedValueOnce(new Error("rpc down"));
+    const result = await registerGarment(deps, null, good);
+    expect(result).toEqual({ status: 502, body: { error: "chain_failed", pid: "TM-ABCDEFGH23" } });
+    expect(deps.store.updateGarment).toHaveBeenCalledTimes(1);
+    expect(deps.store.updateGarment).toHaveBeenCalledWith("TM-ABCDEFGH23", { status: "failed" });
+    expect(deps.makeQrDataUrl).not.toHaveBeenCalled();
+  });
+
+  it("chain failure is still a 502 when marking the row failed also fails", async () => {
+    const deps = makeDeps();
+    deps.chain.registerOnChain.mockRejectedValueOnce(new Error("rpc down"));
+    deps.store.updateGarment.mockRejectedValueOnce(new Error("db down"));
+    const result = await registerGarment(deps, null, good);
+    expect(result.status).toBe(502);
+    expect(deps.makeQrDataUrl).not.toHaveBeenCalled();
+  });
+
+  it("a retry after a failed registration clears the failed row and succeeds", async () => {
+    const deps = makeDeps();
+    deps.store.findGarmentBySku.mockResolvedValueOnce({ pid: "TM-FAILED0001", status: "failed" } as GarmentRow);
+    const result = await registerGarment(deps, null, good);
+    expect(result.status).toBe(201);
+    expect(deps.store.deleteGarment).toHaveBeenCalledWith("TM-FAILED0001");
+  });
+
+  it("pending and confirmed rows still block the SKU and are never deleted", async () => {
+    for (const status of ["pending", "confirmed"] as const) {
+      const deps = makeDeps();
+      deps.store.findGarmentBySku.mockResolvedValueOnce({ pid: "TM-OTHER00001", status } as GarmentRow);
+      const result = await registerGarment(deps, null, good);
+      expect(result).toEqual({ status: 409, body: { error: "duplicate_sku" } });
+      expect(deps.store.deleteGarment).not.toHaveBeenCalled();
+    }
   });
 
   it("stores no creator when nobody is logged in yet", async () => {

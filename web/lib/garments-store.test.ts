@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { describe, expect, it } from "vitest";
-import { DuplicateError, findGarmentBySku, getGarmentByPid, insertGarment, listGarments, updateGarment } from "./garments-store";
+import { DuplicateError, deleteGarment, findGarmentBySku, getGarmentByPid, insertGarment, listGarments, updateGarment } from "./garments-store";
 
 // A tiny stand-in for the Supabase query builder: every chain method returns the
 // same object, and awaiting it (or calling single/maybeSingle) yields `result`.
@@ -11,7 +11,7 @@ function fakeDb(result: { data?: unknown; error?: { code?: string; message: stri
     calls.push([name, args]);
     return builder;
   };
-  for (const m of ["from", "insert", "select", "update", "eq", "order", "limit"]) builder[m] = record(m);
+  for (const m of ["from", "insert", "select", "update", "delete", "eq", "order", "limit"]) builder[m] = record(m);
   const settled = Promise.resolve({ data: result.data ?? null, error: result.error ?? null });
   builder.single = () => settled;
   builder.maybeSingle = () => settled;
@@ -67,6 +67,13 @@ describe("garments-store", () => {
     const { db, calls } = fakeDb({});
     await updateGarment("TM-1", { status: "confirmed", tx_hash: "0xabc" }, db);
     expect(calls).toContainEqual(["update", [{ status: "confirmed", tx_hash: "0xabc" }]]);
+    expect(calls).toContainEqual(["eq", ["pid", "TM-1"]]);
+  });
+
+  it("deleteGarment deletes by pid", async () => {
+    const { db, calls } = fakeDb({});
+    await deleteGarment("TM-1", db);
+    expect(calls).toContainEqual(["delete", []]);
     expect(calls).toContainEqual(["eq", ["pid", "TM-1"]]);
   });
 

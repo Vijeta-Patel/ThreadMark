@@ -67,6 +67,12 @@ export async function getGarmentByPid(pid: string, db: SupabaseClient = getServe
   return (data as GarmentRow | null) ?? null;
 }
 
+/** Remove a row. Used only to clear a `failed` registration so the SKU can be registered again. */
+export async function deleteGarment(pid: string, db: SupabaseClient = getServerSupabase()): Promise<void> {
+  const { error } = await db.from(TABLE).delete().eq("pid", pid);
+  if (error) fail("delete", error);
+}
+
 export async function updateGarment(pid: string, patch: GarmentPatch, db: SupabaseClient = getServerSupabase()): Promise<void> {
   const { error } = await db.from(TABLE).update(patch).eq("pid", pid);
   if (error) fail("update", error);

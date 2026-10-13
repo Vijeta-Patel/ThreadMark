@@ -11,6 +11,7 @@ export interface RegisterDeps {
     findGarmentBySku(sku: string): Promise<GarmentRow | null>;
     insertGarment(row: NewGarment): Promise<GarmentRow>;
     updateGarment(pid: string, patch: GarmentPatch): Promise<void>;
+    deleteGarment(pid: string): Promise<void>;
   };
   chain: { registerOnChain(pid: string, hashHex: string): Promise<{ txHash: string }> };
   makeQrDataUrl(url: string): Promise<string>;
@@ -36,7 +37,13 @@ export async function registerGarment(deps: RegisterDeps, userId: string | null,
   const sku = normalizeGarment(input).sku;
   const hash = computeHash(input);
 
-  if (await deps.store.findGarmentBySku(sku)) return { status: 409, body: { error: "duplicate_sku" } };
+  const existing = await deps.store.findGarmentBySku(sku);
+  if (existing) {
+    // A registration whose chain write failed never produced a usable passport,
+    // so it must not block a retry. Any other existing row is a real duplicate.
+    if (existing.status !== "failed") return { status: 409, body: { error: "duplicate_sku" } };
+    await deps.store.deleteGarment(existing.pid);
+  }
 
   let pid = "";
   let verifyUrl = "";
@@ -66,7 +73,19 @@ export async function registerGarment(deps: RegisterDeps, userId: string | null,
   }
   if (!inserted) throw new Error(`could not generate a unique product id after ${MAX_PID_ATTEMPTS} attempts`);
 
-  const { txHash } = await deps.chain.registerOnChain(pid, hash);
+  let txHash: string;
+  try {
+    ({ txHash } = await deps.chain.registerOnChain(pid, hash));
+  } catch (error) {
+    // The chain write failed: keep the row, mark it failed, issue no QR code.
+    console.error("[register] chain write failed:", error instanceof Error ? error.message : "unknown error");
+    try {
+      await deps.store.updateGarment(pid, { status: "failed" });
+    } catch {
+      // The row stays `pending`; the 502 below is still the right answer.
+    }
+    return { status: 502, body: { error: "chain_failed", pid } };
+  }
   await deps.store.updateGarment(pid, { status: "confirmed", tx_hash: txHash });
   const qrDataUrl = await deps.makeQrDataUrl(verifyUrl);
 
