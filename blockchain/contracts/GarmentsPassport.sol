@@ -1,33 +1,66 @@
-// SPDX-License-Identifier: MIT
+
+ // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
 contract GarmentPassport {
     struct Garment {
-        string productId;
-        string brand;
+        bytes32 dataHash;
+        uint256 timestamp;
+        address registrant;
     }
-    mapping (string => Garment) public garments;
-    function registerGarment(string memory productId, string memory brand) public {
-        if(bytes(productId).length == 0) {
-            // reject
-            revert("enter product id!");
-        }
 
-        else if(bytes(garments[productId].productId).length != 0) {
-            // as some length of the produntId already exists
-            revert("garment already exists!");
-        }
+    mapping(string => Garment) private garments;
 
-        else {
-            garments[productId] = Garment({
-                productId: productId,
-                brand: brand
-            });
-        }      
+    event GarmentRegistered(
+        string pid,
+        bytes32 dataHash,
+        address registrant,
+        uint256 timestamp
+    );
+
+    function registerGarment(
+        string memory pid,
+        bytes32 dataHash
+    ) public {
+        require(bytes(pid).length > 0, "pid required");
+        require(
+            garments[pid].timestamp == 0,
+            "garment already exists"
+        );
+
+        uint256 registeredAt = block.timestamp;
+
+        garments[pid] = Garment({
+            dataHash: dataHash,
+            timestamp: registeredAt,
+            registrant: msg.sender
+        });
+
+        emit GarmentRegistered(
+            pid,
+            dataHash,
+            msg.sender,
+            registeredAt
+        );
     }
-    function getGarment(string memory productId) public view returns(string memory){
-        Garment memory g;
-        g = garments[productId];
-        return g.brand;
+
+    function getGarment(
+        string memory pid
+    )
+        public
+        view
+        returns (
+            bytes32 dataHash,
+            uint256 timestamp,
+            address registrant
+        )
+    {
+        Garment memory garment = garments[pid];
+
+        return (
+            garment.dataHash,
+            garment.timestamp,
+            garment.registrant
+        );
     }
 }
