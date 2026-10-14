@@ -1,9 +1,15 @@
+
 /blockchain/node_modules/
 /blockchain/artifacts/
 /blockchain/cache/
 
-.env
-/blockchain/.env
-
 /blockchain/ignition/deployments/chain-11155111/artifacts/
 /blockchain/ignition/deployments/chain-11155111/build-info/
+
+.env
+.env.local
+/blockchain/.env
+
+web/node_modules/
+web/.next/
+web/.mock-chain.json

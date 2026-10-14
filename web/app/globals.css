@@ -1,0 +1,157 @@
+@import "tailwindcss";
+
+/* ThreadMark visual style: one brand red on white, a big wordmark, small sans text
+   with serif-italic accents, outlined pill buttons, hairline dividers, mono labels.
+   Shared by every page; reuse these tokens and classes rather than adding new colours. */
+
+:root {
+  --brand: #cf1830;
+  --paper: #ffffff;
+  --mist: #f8f4f4;
+  --sky: #6db1f0;
+  --line: rgb(207 24 48 / 0.3);
+}
+
+@theme inline {
+  --color-brand: var(--brand);
+  --color-paper: var(--paper);
+  --color-mist: var(--mist);
+  --color-sky: var(--sky);
+  --font-sans: var(--font-sans-body);
+  --font-serif: var(--font-serif-accent);
+  --font-mono: var(--font-mono-label);
+}
+
+html {
+  background: var(--paper);
+  color-scheme: light;
+}
+
+body {
+  background: var(--paper);
+  color: var(--brand);
+  font-family: var(--font-sans-body), sans-serif;
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+::selection {
+  background: var(--brand);
+  color: var(--paper);
+}
+
+/* Serif italic accent inside headings and text: "Register a <em>garment</em>" */
+em {
+  font-family: var(--font-serif-accent), serif;
+  font-style: italic;
+  font-weight: 400;
+}
+
+.display {
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+/* Tiny uppercase label */
+.tag {
+  font-family: var(--font-mono-label), monospace;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.hairline {
+  border-color: var(--line);
+}
+
+/* Pill buttons and links: serif italic label in an outlined (or filled) ellipse */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px solid var(--brand);
+  border-radius: 9999px;
+  padding: 0.55rem 1.6rem;
+  font-family: var(--font-serif-accent), serif;
+  font-style: italic;
+  font-size: 1.25rem;
+  line-height: 1.1;
+  color: var(--brand);
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+.pill:hover,
+.pill:focus-visible {
+  background: var(--brand);
+  color: var(--paper);
+}
+.pill-solid {
+  background: var(--brand);
+  color: var(--paper);
+}
+.pill-solid:hover,
+.pill-solid:focus-visible {
+  background: var(--paper);
+  color: var(--brand);
+}
+.pill:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+
+/* Underline-only inputs */
+.field {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--brand);
+  border-radius: 0;
+  background: transparent;
+  padding: 0.5rem 0;
+  font-size: 1.25rem;
+  color: var(--brand);
+  outline: none;
+}
+.field::placeholder {
+  color: rgb(207 24 48 / 0.4);
+}
+.field:focus {
+  border-bottom-width: 2px;
+  padding-bottom: calc(0.5rem - 1px);
+}
+.field[aria-invalid="true"] {
+  background: var(--mist);
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+}
+
+/* Status labels (always text, never colour alone) */
+.status {
+  display: inline-block;
+  border: 1px solid var(--brand);
+  border-radius: 9999px;
+  padding: 0.1rem 0.7rem;
+  font-family: var(--font-mono-label), monospace;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+.status-failed {
+  background: var(--brand);
+  color: var(--paper);
+}
+.status-pending {
+  border-style: dashed;
+}
+
+/* Fira Code turns "0x" into "0×". Hashes and ids must show exactly what they are. */
+.font-mono,
+.tag,
+.status {
+  font-variant-ligatures: none;
+  font-feature-settings: "calt" 0, "liga" 0;
+}
