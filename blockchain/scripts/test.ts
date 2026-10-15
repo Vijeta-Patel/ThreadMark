@@ -22,4 +22,7 @@ async function main() {
     console.log("  Registrant:", registrant);
 }
 
-main().catch(console.error);
+main().catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+});
