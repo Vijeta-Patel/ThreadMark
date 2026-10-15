@@ -75,25 +75,22 @@ async function VerifyContent({ params }: VerifyPageProps) {
 
   if (result.status === "not_found") {
     return (
-      <div className="rounded-lg border border-gray-300 bg-gray-50 p-6 text-center shadow-sm">
-        <h1 className="text-2xl font-bold text-gray-800">Product Not Found</h1>
-        <p className="mt-2 text-sm text-gray-600">
-          No garment is registered with this Product ID.
-        </p>
-        <div className="mt-4 text-xs font-mono text-gray-500">PID: {pid}</div>
-        <div className="mt-6">
-          <Link href="/verify" className="pill text-sm">
-            Try another PID
-          </Link>
-        </div>
-      </div>
+      <section className="border border-gray-300 bg-gray-50 p-6 md:p-8">
+        <p className="tag mb-3">Passport check</p>
+        <h1 className="display text-4xl md:text-5xl">Product Not Found</h1>
+        <p className="mt-3">No garment is registered with this Product ID.</p>
+        <p className="tag mt-4">PID: {pid}</p>
+        <Link href="/" className="pill mt-6">
+          Scan another garment
+        </Link>
+      </section>
     );
   }
 
   const isVerified = result.status === "verified";
   const statusBannerClass = isVerified
-    ? "border-green-500 bg-green-50 text-green-900"
-    : "border-red-500 bg-red-50 text-red-900";
+    ? "border-2 border-green-600 bg-green-50 text-green-900"
+    : "border-2 border-brand bg-red-50 text-brand";
 
   const statusHeading = isVerified ? "✓ PRODUCT VERIFIED" : "⚠ VERIFICATION FAILED";
   const statusMessage = isVerified
@@ -101,99 +98,78 @@ async function VerifyContent({ params }: VerifyPageProps) {
     : "The product information does not match the registered blockchain record. Do not trust this product.";
 
   const product = result.product;
+  const txUrl = result.txHash && explorerPrefix ? `${explorerPrefix.replace(/\/+$/, "")}/${result.txHash}` : null;
+
+  // Passport labels in exact order per section 9.9:
+  // Product ID, Brand, SKU, Fabric, Origin, Manufacturing date, Registered on, Blockchain transaction, Image
+  const rows: Array<{ label: string; value: React.ReactNode; mono?: boolean }> = [
+    { label: "Product ID", value: result.pid, mono: true },
+    { label: "Brand", value: product.brand },
+    { label: "SKU", value: product.sku, mono: true },
+    { label: "Fabric", value: product.fabric },
+    { label: "Origin", value: product.origin },
+    { label: "Manufacturing date", value: product.manufacturingDate },
+    { label: "Registered on", value: formatUtc(result.registeredAt) },
+    {
+      label: "Blockchain transaction",
+      mono: true,
+      value: result.txHash ? (
+        txUrl ? (
+          <a href={txUrl} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">
+            {result.txHash}
+          </a>
+        ) : (
+          result.txHash
+        )
+      ) : (
+        <em>No blockchain record</em>
+      ),
+    },
+  ];
 
   return (
     <>
-      {/* 1. Status Banner */}
-      <section className={`rounded-lg border-2 p-6 shadow-sm ${statusBannerClass}`}>
-        <h1 className="text-xl font-bold tracking-tight">{statusHeading}</h1>
-        <p className="mt-2 text-sm leading-relaxed">{statusMessage}</p>
+      {/* 1. Status banner */}
+      <section className={`p-6 md:p-8 ${statusBannerClass}`}>
+        <h1 className="text-2xl font-black tracking-tight md:text-3xl">{statusHeading}</h1>
+        <p className="mt-2">{statusMessage}</p>
       </section>
 
-      {/* 2. Digital Product Passport Details */}
-      <section className="card mt-6">
-        <h2 className="display text-xl font-semibold">Digital Product Passport</h2>
-
-        {/* Optional Image */}
-        {product.imageUrl && (
-          <div className="mt-4 overflow-hidden rounded-md border border-gray-200">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={product.imageUrl}
-              alt={`${product.brand} - ${product.sku}`}
-              className="h-64 w-full object-cover"
-            />
-          </div>
-        )}
-
-        {/* Passport labels in exact order per section 9.9:
-            Product ID, Brand, SKU, Fabric, Origin, Manufacturing date, Registered on, Blockchain transaction, Image */}
-        <dl className="mt-6 divide-y divide-gray-100 text-sm">
-          <div className="py-3 flex justify-between">
-            <dt className="text-gray-500 font-medium">Product ID</dt>
-            <dd className="font-mono font-semibold text-gray-900">{result.pid}</dd>
-          </div>
-          <div className="py-3 flex justify-between">
-            <dt className="text-gray-500 font-medium">Brand</dt>
-            <dd className="text-gray-900 font-medium">{product.brand}</dd>
-          </div>
-          <div className="py-3 flex justify-between">
-            <dt className="text-gray-500 font-medium">SKU</dt>
-            <dd className="font-mono text-gray-900">{product.sku}</dd>
-          </div>
-          <div className="py-3 flex justify-between">
-            <dt className="text-gray-500 font-medium">Fabric</dt>
-            <dd className="text-gray-900">{product.fabric}</dd>
-          </div>
-          <div className="py-3 flex justify-between">
-            <dt className="text-gray-500 font-medium">Origin</dt>
-            <dd className="text-gray-900">{product.origin}</dd>
-          </div>
-          <div className="py-3 flex justify-between">
-            <dt className="text-gray-500 font-medium">Manufacturing date</dt>
-            <dd className="text-gray-900">{product.manufacturingDate}</dd>
-          </div>
-          <div className="py-3 flex justify-between">
-            <dt className="text-gray-500 font-medium">Registered on</dt>
-            <dd className="text-gray-900">{formatUtc(result.registeredAt)}</dd>
-          </div>
-          <div className="py-3 flex flex-col gap-1 sm:flex-row sm:justify-between">
-            <dt className="text-gray-500 font-medium">Blockchain transaction</dt>
-            <dd className="text-gray-900 font-mono text-xs break-all">
-              {result.txHash ? (
-                explorerPrefix ? (
-                  <a
-                    href={`${explorerPrefix.replace(/\/+$/, "")}/${result.txHash}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 underline hover:text-blue-800"
-                  >
-                    {result.txHash}
-                  </a>
-                ) : (
-                  <span>{result.txHash}</span>
-                )
-              ) : (
-                <span className="text-gray-400 italic">No blockchain record</span>
-              )}
-            </dd>
-          </div>
+      {/* 2. Digital Product Passport */}
+      <section className="mt-10 grid gap-8 md:grid-cols-[1fr_1.3fr]">
+        <div>
+          <p className="tag mb-3">ThreadMark</p>
+          <h2 className="display text-4xl md:text-5xl">
+            Digital Product <em>Passport</em>
+          </h2>
+          {product.imageUrl && (
+            <div className="mt-6 border hairline">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={product.imageUrl} alt={`${product.brand} - ${product.sku}`} className="aspect-square w-full object-cover" />
+            </div>
+          )}
+        </div>
+        <dl>
+          {rows.map((row) => (
+            <div key={row.label} className="flex flex-col gap-1 border-t hairline py-3 sm:flex-row sm:justify-between sm:gap-6">
+              <dt className="tag shrink-0">{row.label}</dt>
+              <dd className={`break-all sm:text-right ${row.mono ? "font-mono text-sm" : ""}`}>{row.value}</dd>
+            </div>
+          ))}
         </dl>
       </section>
 
-      <div className="mt-6 text-center">
-        <Link href="/verify" className="text-xs text-gray-500 underline hover:text-black">
-          ← Verify another garment
-        </Link>
-      </div>
+      <Link href="/" className="pill mt-10">
+        Scan another garment
+      </Link>
     </>
   );
 }
 
 export default function VerifyPage(props: VerifyPageProps) {
   return (
-    <main className="mx-auto max-w-lg px-5 pt-10 pb-20">
-      <Suspense fallback={<p className="text-center text-sm text-gray-500">Checking passport...</p>}>
+    <main className="mx-auto w-full max-w-5xl px-5 pt-10 pb-10 md:pt-16">
+      <Suspense fallback={<p className="tag">Checking passport…</p>}>
         <VerifyContent {...props} />
       </Suspense>
     </main>
