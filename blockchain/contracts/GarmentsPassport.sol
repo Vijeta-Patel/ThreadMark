@@ -3,31 +3,39 @@ pragma solidity ^0.8.28;
 
 contract GarmentPassport {
     struct Garment {
-        string productId;
-        string brand;
+        bytes32 dataHash;
+        uint256 timestamp;
+        address registrant;
     }
-    mapping (string => Garment) public garments;
-    function registerGarment(string memory productId, string memory brand) public {
-        if(bytes(productId).length == 0) {
-            // reject
-            revert("enter product id!");
+
+    mapping(string => Garment) private garments;
+
+    event GarmentRegistered(string pid, bytes32 dataHash, address registrant, uint256 timestamp);
+
+    function registerGarment(string calldata pid, bytes32 dataHash) external {
+        if (bytes(pid).length == 0) {
+            revert("pid required");
         }
 
-        else if(bytes(garments[productId].productId).length != 0) {
-            // as some length of the produntId already exists
-            revert("garment already exists!");
+        if (garments[pid].timestamp != 0) {
+            revert("garment already exists");
         }
 
-        else {
-            garments[productId] = Garment({
-                productId: productId,
-                brand: brand
-            });
-        }      
+        garments[pid] = Garment({
+            dataHash: dataHash,
+            timestamp: block.timestamp,
+            registrant: msg.sender
+        });
+
+        emit GarmentRegistered(pid, dataHash, msg.sender, block.timestamp);
     }
-    function getGarment(string memory productId) public view returns(string memory){
-        Garment memory g;
-        g = garments[productId];
-        return g.brand;
+
+    function getGarment(string calldata pid)
+        external
+        view
+        returns (bytes32 dataHash, uint256 timestamp, address registrant)
+    {
+        Garment memory g = garments[pid];
+        return (g.dataHash, g.timestamp, g.registrant);
     }
 }

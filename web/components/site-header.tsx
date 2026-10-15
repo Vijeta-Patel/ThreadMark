@@ -1,51 +1,40 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Suspense } from "react";
 import { NAV_ITEMS } from "./nav-items";
 import { Wordmark } from "./wordmark";
 
-const TAGLINE = "Garment authentication & Digital Product Passports";
-
-/** Big wordmark on the home page, a compact bar everywhere else. */
-export function SiteHeader() {
+function HeaderNav() {
   const pathname = usePathname();
-  const nav = (
+  return (
     <nav aria-label="Main" className="flex flex-wrap gap-x-4 gap-y-1">
       {NAV_ITEMS.map((item) => (
         <Link
           key={item.href}
           href={item.href}
-          aria-current={pathname === item.href ? "page" : undefined}
-          className={pathname === item.href ? "underline underline-offset-4" : "hover:underline underline-offset-4"}
+          className={`link text-xs tracking-wider uppercase transition-colors ${
+            pathname === item.href ? "text-red-700 font-semibold" : "text-gray-600 hover:text-black"
+          }`}
         >
           {item.label}
         </Link>
       ))}
     </nav>
   );
+}
 
-  if (pathname === "/") {
-    return (
-      <header className="px-5 pt-5">
-        <Link href="/" aria-label="ThreadMark home">
-          <Wordmark className="block w-full" />
-        </Link>
-        <div className="mt-3 grid gap-2 md:grid-cols-2">
-          <p>{TAGLINE}</p>
-          {nav}
-        </div>
-      </header>
-    );
-  }
-
+export function SiteHeader() {
   return (
-    <header className="px-5 pt-5">
-      <div className="grid items-baseline gap-2 border-b hairline pb-3 md:grid-cols-2">
-        <Link href="/" className="text-2xl font-black tracking-tight">
-          Thread<em className="font-normal">Mark</em>
+    <header className="border-b border-gray-100 px-5 py-4">
+      <div className="mx-auto flex max-w-7xl items-center justify-between">
+        <Link href="/" className="flex items-center gap-2">
+          <Wordmark />
         </Link>
-        {nav}
+        <Suspense fallback={<div className="h-4 w-32" />}>
+          <HeaderNav />
+        </Suspense>
       </div>
     </header>
   );

@@ -1,0 +1,35 @@
+[
+  {
+    "pid": "TM-SEED000001",
+    "sku": "WN260101",
+    "brand": "WeaveNest",
+    "fabric": "Cotton",
+    "origin": "Karnataka, India",
+    "manufacturingDate": "2026-01-10",
+    "imageRef": null,
+    "description": "Valid seed record. Stored data matches on-chain hash exactly."
+  },
+  {
+    "pid": "TM-SEED000002",
+    "sku": "WN260102",
+    "brand": "WeaveNest",
+    "fabric": "Cotton",
+    "origin": "Karnataka, India",
+    "manufacturingDate": "2026-01-10",
+    "imageRef": null,
+    "alteredField": {
+      "fabric": "Polyester"
+    },
+    "description": "Altered seed record. Registered on-chain with valid Cotton hash, then database is modified to Polyester so verification fails."
+  },
+  {
+    "pid": "TM-SEED000003",
+    "sku": "WN260103",
+    "brand": "WeaveNest",
+    "fabric": "Silk",
+    "origin": "Varanasi, India",
+    "manufacturingDate": "2026-01-05",
+    "imageRef": null,
+    "description": "Off-chain only seed record. Stored in database, but never registered on chain, so verification fails."
+  }
+]
