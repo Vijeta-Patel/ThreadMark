@@ -1,55 +1,25 @@
-
 import { ethers } from "ethers";
-import dotenv from "dotenv";
-
-dotenv.config({ path: "../.env" });
+import GarmentPassportAbi from "../abi/GarmentPassport.json";
 
 async function main() {
-    const rpcUrl = process.env.SEPOLIA_RPC_URL;
-    const contractAddress = process.env.CONTRACT_ADDRESS;
-    const privateKey = process.env.SEPOLIA_PRIVATE_KEY;
+    const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
+    const signer = await provider.getSigner();
 
-    if (!rpcUrl || !contractAddress || !privateKey) {
-        throw new Error(
-            "Missing SEPOLIA_RPC_URL, CONTRACT_ADDRESS, or SEPOLIA_PRIVATE_KEY in .env"
-        );
-    }
+    const contractAddress = process.env.CONTRACT_ADDRESS ?? "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+    const contract = new ethers.Contract(contractAddress, GarmentPassportAbi, signer);
 
-    const provider = new ethers.JsonRpcProvider(rpcUrl);
-    const wallet = new ethers.Wallet(privateKey, provider);
+    const samplePid = "GA001";
+    const sampleHash = "0x65c56b8b182f23a89cfd6ccd5c3f0cda8bf2d955ec6ca1a20fa4f94dd41db19b";
 
-    const abi = [
-        "function registerGarment(string pid, bytes32 dataHash) external",
-        "function getGarment(string pid) external view returns (bytes32 dataHash, uint256 timestamp, address registrant)",
-        "event GarmentRegistered(string pid, bytes32 dataHash, address registrant, uint256 timestamp)"
-    ];
+    const tx = await contract.registerGarment(samplePid, sampleHash);
+    await tx.wait(1);
 
-    const contract = new ethers.Contract(
-        contractAddress,
-        abi,
-        wallet
-    );
-
-    const pid = `TM-TEST-${Date.now()}`;
-    const dataHash = ethers.keccak256(
-        ethers.toUtf8Bytes("ThreadMark Sepolia integration test")
-    );
-
-    console.log("Registering test garment:", pid);
-
-    const tx = await contract.registerGarment(pid, dataHash);
-    console.log("Transaction hash:", tx.hash);
-
-    const receipt = await tx.wait(1);
-    console.log("Confirmed in block:", receipt?.blockNumber);
-
-    const [storedHash, timestamp, registrant] =
-        await contract.getGarment(pid);
-
-    console.log("Hash matches:", storedHash === dataHash);
-    console.log("Timestamp:", timestamp.toString());
-    console.log("Registrant:", registrant);
-    console.log("Sepolia integration test complete!");
+    const [dataHash, timestamp, registrant] = await contract.getGarment(samplePid);
+    console.log("Registered garment on local chain:");
+    console.log("  PID:", samplePid);
+    console.log("  Hash:", dataHash);
+    console.log("  Timestamp:", Number(timestamp));
+    console.log("  Registrant:", registrant);
 }
 
 main().catch((error) => {
