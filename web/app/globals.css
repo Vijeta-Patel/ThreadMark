@@ -102,6 +102,27 @@ em {
   cursor: wait;
 }
 
+/* White-on-red versions, for controls sitting on a solid brand-red panel */
+.pill-light {
+  border-color: var(--paper);
+  color: var(--paper);
+}
+.pill-light:hover,
+.pill-light:focus-visible {
+  background: var(--paper);
+  color: var(--brand);
+}
+.pill-light-solid {
+  border-color: var(--paper);
+  background: var(--paper);
+  color: var(--brand);
+}
+.pill-light-solid:hover,
+.pill-light-solid:focus-visible {
+  background: transparent;
+  color: var(--paper);
+}
+
 /* Underline-only inputs */
 .field {
   width: 100%;
@@ -120,6 +141,13 @@ em {
 .field:focus {
   border-bottom-width: 2px;
   padding-bottom: calc(0.5rem - 1px);
+}
+.field-light {
+  border-bottom-color: var(--paper);
+  color: var(--paper);
+}
+.field-light::placeholder {
+  color: rgb(255 255 255 / 0.55);
 }
 .field[aria-invalid="true"] {
   background: var(--mist);
