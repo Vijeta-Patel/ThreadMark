@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Suspense } from "react";
 import { NAV_ITEMS } from "./nav-items";
+import { LogoutButton } from "./logout-button";
 import { Wordmark } from "./wordmark";
 
 function HeaderNav() {
@@ -15,7 +16,7 @@ function HeaderNav() {
           key={item.href}
           href={item.href}
           className={`link text-xs tracking-wider uppercase transition-colors ${
-            pathname === item.href ? "text-red-700 font-semibold" : "text-gray-600 hover:text-black"
+            pathname === item.href ? "font-semibold underline underline-offset-4" : "hover:underline underline-offset-4"
           }`}
         >
           {item.label}
@@ -25,17 +26,31 @@ function HeaderNav() {
   );
 }
 
-export function SiteHeader() {
+// The landing page shows its own giant wordmark, so the header is left off there.
+function HeaderBar() {
+  const pathname = usePathname();
+  if (pathname === "/") return null;
   return (
-    <header className="border-b border-gray-100 px-5 py-4">
-      <div className="mx-auto flex max-w-7xl items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <Wordmark />
+    <header className="border-b hairline px-5 py-4">
+      <div className="flex items-center justify-between gap-4">
+        <Link href="/" aria-label="ThreadMark home" className="shrink-0">
+          <Wordmark className="block w-32 md:w-44" />
         </Link>
-        <Suspense fallback={<div className="h-4 w-32" />}>
-          <HeaderNav />
-        </Suspense>
+        <div className="flex items-center gap-4">
+          <Suspense fallback={<div className="h-4 w-32" />}>
+            <HeaderNav />
+          </Suspense>
+          <LogoutButton />
+        </div>
       </div>
     </header>
+  );
+}
+
+export function SiteHeader() {
+  return (
+    <Suspense fallback={null}>
+      <HeaderBar />
+    </Suspense>
   );
 }

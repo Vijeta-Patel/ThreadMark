@@ -51,7 +51,7 @@ async function GarmentList() {
       return (
         <p role="alert">
           Please log in to continue.{" "}
-          <Link href="/login" className="underline underline-offset-4">
+          <Link href="/" className="underline underline-offset-4">
             Log in
           </Link>
         </p>
